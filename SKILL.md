@@ -38,12 +38,16 @@ description: >
 
 口径权威不在看板私有度量里。Agent 协助建仓/补齐时 MUST 按下列工件推进，缺一则标缺口，禁止用「只写 DAX」或「只写 SQL」冒充闭环。
 
-| 工件 | 落盘（建议） | MUST 包含 |
-| --- | --- | --- |
-| **指标字典** | `docs/metrics.md` 或 metrics.csv / 飞书表 | 业务列 + PBI 建模列：`grain_ref`、`expression`、`filters`、`default_time_dim`、`allowed_dims`、`pbi_measure`、`compute_layer`、`dax_hint`、`analysis_sql` |
-| **schema.yml** | `models/**/schema.yml` | 事实 grain/pk、字段含义、tests；维度键可支撑关系 |
-| **analyses** | `analyses/metrics/{metric_id}.sql` | 与字典 filters/默认时间一致的可运行验数 |
-| **PBI/PBIP** | 认证 Dataset / `.pbip` 工程 | 度量名 = `pbi_measure`；关系与 `allowed_dims` / `default_time_dim` 一致 |
+| 工件 | 落盘（建议） | MUST 包含 | 详细规范 |
+| --- | --- | --- | --- |
+| **指标字典** | `docs/metrics.md` 或 metrics.csv / 飞书表 | 业务列 + PBI 建模列：`grain_ref`、`expression`、`filters`、`default_time_dim`、`allowed_dims`、`pbi_measure`、`compute_layer`、`dax_hint`、`analysis_sql` | [01-metrics-dictionary.md](references/01-metrics-dictionary.md) |
+| **schema.yml** | `models/**/schema.yml` | 事实 grain/pk、字段含义、tests；维度键可支撑关系 | [02-schema-yml.md](references/02-schema-yml.md) |
+| **analyses** | `analyses/metrics/{metric_id}.sql` | 与字典 filters/默认时间一致的可运行验数 | [03-analyses.md](references/03-analyses.md) |
+| **PBI/PBIP** | 认证 Dataset / `.pbip` 工程 | 度量名 = `pbi_measure`；关系与 `allowed_dims` / `default_time_dim` 一致 | [04-pbi-pbip.md](references/04-pbi-pbip.md) |
+
+总览与落盘：[00-overview.md](references/00-overview.md) · 索引：[references/README.md](references/README.md) · 发版：[05-release-checklist.md](references/05-release-checklist.md) · 口诀：[06-cheatsheet.md](references/06-cheatsheet.md)
+
+**建立/补齐四件套时**：MUST **Read** 对应 `references/*.md` 后再写仓库文件；字段名、示例、模板以 references 为准。
 
 ### A.1 字典与 schema
 
@@ -119,6 +123,8 @@ spec/
 
 字典 + schema 已就绪时，落地 Power BI **Project（PBIP）** 或等价语义模型。
 
+详细流程、AI prompt、DAX 提示、exposures：**MUST Read** [references/04-pbi-pbip.md](references/04-pbi-pbip.md)。
+
 ### C.1 强制
 
 - **MUST** 只读字典/schema/analyses，**禁止改口径**；冲突标出并停，勿猜。
@@ -165,4 +171,12 @@ PowerShell 下先 `Set-Location` 到 dbt 项目根，再跑相对路径命令。
 
 ## 项目 AGENTS.md 建议
 
-见 `references/agents-snippet.md`。Templates：`references/templates/{requirements,design,tasks}.md`。
+见 `references/agents-snippet.md`。
+
+## references 与 templates
+
+| 路径 | 用途 |
+| --- | --- |
+| [references/README.md](references/README.md) | 规范索引 |
+| [references/00-overview.md](references/00-overview.md) … [06-cheatsheet.md](references/06-cheatsheet.md) | 四件套字段/模板级规范（来自团队文档） |
+| [references/templates/](references/templates/) | spec：`requirements` / `design` / `tasks` |
