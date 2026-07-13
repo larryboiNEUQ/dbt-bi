@@ -61,10 +61,18 @@ description: >
 - 每个 certified 核心指标至少 1 条 `analyses/metrics/{metric_id}.sql`。
 - 验收：同日同过滤，SQL 结果 = PBI 卡片。
 
-### A.3 与 DE
+### A.3 数据就绪：物化 vs 逻辑模型 SQL
 
-- 建模/PBIP 只连 marts（或约定 schema），不连 stg/raw。
-- 粒度变更 = breaking，先对齐物化再改关系/度量。
+数据有两条路径（正式看板优先 Path A）：
+
+| 路径 | 何时 | 怎么取数 |
+| --- | --- | --- |
+| **Path A · 物化** | DE 已物化到约定 schema（如 marts） | PBIP/PBI **只连 marts**，不连 stg/raw |
+| **Path B · 逻辑模型 SQL** | 逻辑尚未到可物化/可调度 | 用 dbt **逻辑模型**（`ref` 链）`compile`/预览 SQL 直查仓库；analyses 同样基于逻辑模型编译后跑。**禁止**把 stg/raw 当官方数 |
+
+- **MUST** 未物化不阻塞口径与验数：Path B 仍以字典 + schema + analyses 为准。
+- **MUST** 物化完成后，对数与正式 Dataset **切到 marts**（Path A）。
+- 粒度变更 = breaking；Path A 先对齐物化再改关系/度量。
 
 ---
 
@@ -136,7 +144,7 @@ spec/
 
 ### C.2 执行清单（可当内部 checklist）
 
-1. 进模表：`grain_ref` ∪ 维度目录维表 → 连 marts。  
+1. 进模表：`grain_ref` ∪ 维度目录维表 → Path A 连 marts；Path B 基于逻辑模型 compile SQL 取数。  
 2. 关系：维度目录键 + `allowed_dims`；标默认日期关系。  
 3. 隐藏列：schema 代理键/中间列。  
 4. 度量：逐行字典 → DAX；`display_folder` 归组。  
@@ -151,7 +159,7 @@ spec/
 输入（只读）：
 - 指标字典：<docs/metrics.md 或表路径>
 - schema / 维度目录：<models/**/schema.yml>
-- PBIP / marts：<.pbix 工程路径或库.schema>
+- 数据就绪：Path A marts <库.schema 或 .pbip>；或 Path B dbt 项目（逻辑模型 SQL，未物化）
 - 范围：certified 或 metric_id 列表 <...>
 
 按 Part C 清单输出表/关系/隐藏列/度量 DAX/对数清单；有 NEEDS CLARIFICATION 则停。
