@@ -144,8 +144,8 @@ spec/
 
 ### C.2 执行清单（可当内部 checklist）
 
-1. 进模表：`grain_ref` ∪ 维度目录维表 → Path A 连 marts；Path B 基于逻辑模型 compile SQL 取数。  
-2. 关系：维度目录键 + `allowed_dims`；标默认日期关系。  
+1. 进模表：`grain_ref` ∪ schema 中的 dim 表（可选维度目录仅作索引）→ Path A 连 marts；Path B 基于逻辑模型 compile SQL 取数。  
+2. 关系：schema 维键（可选维度目录协助角色映射）+ `allowed_dims`；标默认日期关系。  
 3. 隐藏列：schema 代理键/中间列。  
 4. 度量：逐行字典 → DAX；`display_folder` 归组。  
 5. 对数清单：`analysis_sql` + 建议筛选。  
@@ -158,7 +158,7 @@ spec/
 
 输入（只读）：
 - 指标字典：<docs/metrics.md 或表路径>
-- schema / 维度目录：<models/**/schema.yml>
+- schema.yml（维度目录可选，从 schema 整理）：<models/**/schema.yml>
 - 数据就绪：Path A marts <库.schema 或 .pbip>；或 Path B dbt 项目（逻辑模型 SQL，未物化）
 - 范围：certified 或 metric_id 列表 <...>
 
