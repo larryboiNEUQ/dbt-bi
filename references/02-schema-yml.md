@@ -1,20 +1,12 @@
 # schema.yml 规范
 
-> 来源：文档 §2。表粒度、字段；维度目录为可选，从 schema 整理。
+> 来源：文档 §2。事实粒度登记、维度目录均为可选，从 schema 整理。
 
 ## schema.yml（表粒度 / 字段）
 
 逻辑模型（dim/fct）决定「数从哪来、一行是什么」；`schema.yml` 是粒度与字段含义的**可执行合同**（含 tests）。
 
-### 2.1 事实粒度登记
-
-| table | grain（一行是什么） | pk | 备注 |
-| --- | --- | --- | --- |
-| fct_orders | 一笔已支付订单 | order_id | 非订单行；退款见 fct_refunds |
-| fct_order_items | 一行订单明细 | order_item_id |  |
-| agg_sales_day | 一天 × 一店铺 | date_key + store_id | 不可下钻到订单 |
-
-### 2.2 schema.yml 写法示例
+### 2.1 schema.yml 写法示例
 ```plaintext
 models:
   - name: fct_orders
@@ -32,9 +24,15 @@ models:
 
 ```
 
-### 2.3 维度目录（可选，从 schema 整理）
+### 2.2 事实粒度登记（可选，从schema 整理）
 
-**不是**独立 dbt 产物，也**不必**单独 codegen。属性/键的真相在 dim 模型 + `schema.yml`；需要时从 schema 整理出 `dim_id` 一览（含时间角色如支付日/下单日），供字典 `allowed_dims` 与 PBI 关系使用。
+| table | grain（一行是什么） | pk | 备注 |
+| --- | --- | --- | --- |
+| fct_orders | 一笔已支付订单 | order_id | 非订单行；退款见 fct_refunds |
+| fct_order_items | 一行订单明细 | order_item_id |  |
+| agg_sales_day | 一天 × 一店铺 | date_key + store_id | 不可下钻到订单 |
+
+### 2.3 维度目录（可选，从schema 整理）
 
 | dim_id | 名称 | 来源表 | 键 / 关联 | 层级或常用属性 | 备注 |
 | --- | --- | --- | --- | --- | --- |

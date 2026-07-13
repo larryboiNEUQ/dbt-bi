@@ -23,7 +23,7 @@ description: >
 
 ```text
 【建立/维护四件套】
-  指标字典（口径 + PBI 建模列）
+  指标字典（口径 + PBI 语义建模列）
       + schema.yml（grain / 字段 / 维键）
       + analyses（验数 SQL）
       + PBI/PBIP（按字典落 DAX）
@@ -40,7 +40,7 @@ description: >
 
 | 工件 | 落盘（建议） | MUST 包含 | 详细规范 |
 | --- | --- | --- | --- |
-| **指标字典** | `docs/metrics.md` 或 metrics.csv / 飞书表 | 业务列 + PBI 建模列：`grain_ref`、`expression`、`filters`、`default_time_dim`、`allowed_dims`、`pbi_measure`、`compute_layer`、`dax_hint`、`analysis_sql` | [01-metrics-dictionary.md](references/01-metrics-dictionary.md) |
+| **指标字典** | `docs/metrics.md` 或 metrics.csv / 飞书表 | 业务列 + PBI 语义建模列：`grain_ref`、`expression`、`filters`、`default_time_dim`、`allowed_dims`、`pbi_measure`、`compute_layer`、`dax_hint`、`analysis_sql` | [01-metrics-dictionary.md](references/01-metrics-dictionary.md) |
 | **schema.yml** | `models/**/schema.yml` | 事实 grain/pk、字段含义、tests；维度键可支撑关系 | [02-schema-yml.md](references/02-schema-yml.md) |
 | **analyses** | `analyses/metrics/{metric_id}.sql` | 与字典 filters/默认时间一致的可运行验数 | [03-analyses.md](references/03-analyses.md) |
 | **PBI/PBIP** | 认证 Dataset / `.pbip` 工程 | 度量名 = `pbi_measure`；关系与 `allowed_dims` / `default_time_dim` 一致 | [04-pbi-pbip.md](references/04-pbi-pbip.md) |
