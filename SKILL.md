@@ -43,7 +43,7 @@ description: >
 | **指标字典** | `docs/metrics.md` 或 metrics.csv / 飞书表 | 业务列 + PBI 语义建模列：`grain_ref`、`expression`、`filters`、`default_time_dim`、`allowed_dims`、`pbi_measure`、`compute_layer`、`dax_hint`、`analysis_sql` | [01-metrics-dictionary.md](references/01-metrics-dictionary.md) |
 | **schema.yml** | `models/**/schema.yml` | 事实 grain/pk、字段含义、tests；维度键可支撑关系 | [02-schema-yml.md](references/02-schema-yml.md) |
 | **analyses** | `analyses/metrics/{metric_id}.sql` | 与字典 filters/默认时间一致的可运行验数 | [03-analyses.md](references/03-analyses.md) |
-| **PBI/PBIP** | 认证 Dataset / `.pbip` 工程 | 度量名 = `pbi_measure`；关系与 `allowed_dims` / `default_time_dim` 一致 | [04-pbi-pbip.md](references/04-pbi-pbip.md) |
+| **PBI/PBIP** | **独立 PBIP 仓库**（报表层，与 dbt 仓分离）+ 认证 Dataset | 度量名 = `pbi_measure`；关系与 `allowed_dims` / `default_time_dim` 一致；dbt 仓用 `exposures.yml` 挂 **看板 URL + PBIP 仓 URL** | [04-pbi-pbip.md](references/04-pbi-pbip.md) |
 
 总览与落盘：[00-overview.md](references/00-overview.md) · 索引：[references/README.md](references/README.md) · 发版：[05-release-checklist.md](references/05-release-checklist.md) · 口诀：[06-cheatsheet.md](references/06-cheatsheet.md)
 
@@ -127,14 +127,16 @@ spec/
 
 ---
 
-## Part C — 实施到 PBIP 项目（MUST）
+## Part C — 实施到独立 PBIP 仓库（MUST）
 
-字典 + schema 已就绪时，落地 Power BI **Project（PBIP）** 或等价语义模型。
+字典 + schema 已就绪时，在 **独立的 PBIP/报表仓库**（与 dbt 仓分离）落地语义模型与 DAX；dbt 仓只登记依赖与链接，不把报表工程塞进 dbt 根目录。
 
 详细流程、AI prompt、DAX 提示、exposures：**MUST Read** [references/04-pbi-pbip.md](references/04-pbi-pbip.md)。
 
 ### C.1 强制
 
+- **MUST** PBIP 作为报表层 **独立仓库**；dbt 仓通过 `models/exposures.yml`（或约定路径）链接下游。
+- **MUST** 每个正式看板 exposure 至少含：`url`（最终看板/Service 链接）+ **`meta.pbip_repo_url`**（PBIP 仓地址）；可选 `meta.dataset_url` / `meta.pbip_path`。
 - **MUST** 只读字典/schema/analyses，**禁止改口径**；冲突标出并停，勿猜。
 - **MUST** 度量显示名 = `pbi_measure`；优先 `dax_hint`；落实 `filters` 与 `compute_layer`。
 - **MUST** 关系：维 1→* 事实；默认时间 = `default_time_dim`；多时间角色分开。
@@ -157,12 +159,13 @@ spec/
 按 DBT-BI skill 执行。字典与 schema 已填好，生成/更新 PBIP 语义模型与 DAX，禁止改口径。
 
 输入（只读）：
-- 指标字典：<docs/metrics.md 或表路径>
-- schema.yml（维度目录可选，从 schema 整理）：<models/**/schema.yml>
-- 数据就绪：Path A marts <库.schema 或 .pbip>；或 Path B dbt 项目（逻辑模型 SQL，未物化）
+- dbt 仓：指标字典 + schema.yml（维度目录可选）
+- PBIP 独立仓路径：<path 或 git URL>
+- 数据就绪：Path A marts <库.schema>；或 Path B dbt 逻辑模型 SQL（未物化）
 - 范围：certified 或 metric_id 列表 <...>
 
-按 Part C 清单输出表/关系/隐藏列/度量 DAX/对数清单；有 NEEDS CLARIFICATION 则停。
+在 PBIP 仓生成/更新模型与 DAX；在 dbt 仓写/更新 exposures（url=看板链接，meta.pbip_repo_url=PBIP 仓）。
+输出表/关系/隐藏列/度量 DAX/对数清单/exposures 草稿；有 NEEDS CLARIFICATION 则停。
 ```
 
 ---

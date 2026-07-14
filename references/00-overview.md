@@ -43,7 +43,7 @@ models/exposures.yml     # 正式 PBI 看板依赖
 | 指标字典 | 业务口径 + PBI 建模列（权威） |
 | schema.yml | 表 grain、主键、字段、维键 |
 | analyses | 可运行验数 SQL |
-| PBIP / PBI DAX | 按字典 1:1 交互实现 |
+| 独立 PBIP 仓 + exposures 链接 | 按字典 1:1 交互实现 |
 
 Agent 发现缺件 → 先补四件套缺口，再大改业务或看板。
 
