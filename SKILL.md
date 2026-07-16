@@ -38,8 +38,8 @@ description: >
            │
            ▼
 【单次工程变更】
-  使用已配置的 issue tracker / domain docs / engineering skills
-  dbt 实现 → 回写四件套 → 更新 PBIP → 对数
+  Coding Agent 动态发现当前环境中的 Matt Pocock engineering skills
+  按任务路由 → dbt 实现 → 回写四件套 → 更新 PBIP → 对数
 ```
 
 ---
@@ -59,13 +59,13 @@ description: >
 
 调用后严格遵循它的停点，不要自行简化成一次性写文件：
 
-1. **Explore**：读取 `git remote -v`、`.git/config`、`AGENTS.md`/`CLAUDE.md`、上下文文档、ADR、`docs/agents/`、`.scratch/`、triage skill 和 monorepo 信号。
-2. **Present findings and ask**：先报告发现，再按顺序确认 issue tracker；仅在 triage skill 已安装时确认 triage labels；domain docs 默认 single-context。
-3. **Confirm and edit**：展示待写入的 `## Agent skills` block 和 `docs/agents/*.md` 草稿，等待用户确认或修改。如果既没有 `CLAUDE.md` 也没有 `AGENTS.md`，先询问创建哪一个。
-4. **Write**：按确认结果更新选定的 Agent 指令文件，并写入 `docs/agents/issue-tracker.md`、`docs/agents/domain.md`，以及仅在需要时写入 `docs/agents/triage-labels.md`。
-5. **Done**：回读配置，说明后续 engineering skills 将从这些文件读取仓库约定。
+1. **Explore**：由 setup skill 按其当前版本检查 remote、Agent 指令、上下文文档、既有配置和仓库结构；DBT-BI 不复制或维护其内部检查清单。
+2. **Present findings and ask**：由 setup skill 按其当前版本呈现发现并完成所需确认。
+3. **Confirm and edit**：展示待写入的 `## Agent skills` block 和 `docs/agents/*.md` 草稿，等待用户确认或修改。如果既没有 `CLAUDE.md` 也没有 `AGENTS.md`，按 setup skill 规则处理。
+4. **Write**：按确认结果更新选定的 Agent 指令文件和 `docs/agents/` 配置。
+5. **Done**：回读配置，说明 Matt Pocock engineering skills 将从这些文件读取仓库约定。
 
-setup 未完成或停在澄清点时，DBT-BI 也必须停下；不得猜测 issue tracker、triage 标签、上下文布局或直接启动旧模板。
+setup 未完成或停在澄清点时，DBT-BI 也必须停下；不得猜测 setup 决策或直接启动旧模板。
 
 ---
 
@@ -111,40 +111,35 @@ setup 未完成或停在澄清点时，DBT-BI 也必须停下；不得猜测 iss
 
 ---
 
-## Part B — 工程变更入口：调用 setup-matt-pocock-skills（MUST）
+## Part B — 工程变更入口：运行时发现 Matt Pocock engineering skills（MUST）
 
-涉及 dbt model、macro、source、test 的工程变更，或用户提出 spec 驱动需求时，MUST 先显式调用 `$setup-matt-pocock-skills`。
+涉及 dbt model、macro、source、test 的工程变更，或用户提出 spec 驱动需求时，先检查 Part 0 的 setup 配置是否已完成。未完成则回到 Part 0；已完成则不重复运行 `$setup-matt-pocock-skills`。
 
-如果尚未完成 Part 0，必须先回到 Part 0；不能直接创建 spec 文件或开始工程实现。
+### B.1 动态发现与路由
 
-该 skill 的 frontmatter 标记为 `disable-model-invocation: true`，因此必须显式调用，不能假定它会被隐式加载。它负责仓库级工程技能配置；DBT-BI 不再维护一套并行的 requirements/design/tasks spec workflow。
+setup 完成后，Coding Agent MUST 在自己的当前环境中动态发现已安装且可用的 Matt Pocock engineering skills，读取候选 skill 的名称、描述与触发条件后按任务意图路由。DBT-BI 不维护或枚举固定的下游 skill 列表；所需 skill 缺失时，提示用户安装并暂停对应流程。
 
-### B.1 setup handoff
-
-按 setup skill 的顺序执行，不得跳过确认停点：
-
-1. **Explore**：检查 remote、AGENTS/CLAUDE、现有 `docs/agents/`、上下文文档、ADR、`.scratch/`、triage skill 和 monorepo 信号。
-2. **Present findings and ask**：呈现发现，并按顺序确认 issue tracker、triage labels（仅在安装 triage 时）和 domain docs。
-3. **Confirm and edit**：展示 `## Agent skills` 及 `docs/agents/*.md` 草稿，等待确认或修改。
-4. **Write**：写入选定的 `AGENTS.md`/`CLAUDE.md` 与 `docs/agents/` 配置。
-
-建议使用 GitHub issue tracker（仓库 remote 指向 GitHub 时）和 single-context；triage labels 只在 triage skill 已安装且用户确认后写入。
+1. 发现范围以 Coding Agent 自己当前可见、已安装且可调用的 Matt Pocock engineering skills 为准。
+2. 选择前读取候选 skill 的元数据和完整指令，不根据 DBT-BI 中的旧名称或历史版本猜测。
+3. 文档、模板和 AGENTS snippet 都不得保存固定下游 skill 清单。
+4. 找不到任务所需能力时，明确指出缺失的能力或 skill，提示安装后再继续。
+5. 若当前任务不需要专门的 Matt skill，则由 Coding Agent 按仓库配置和 DBT-BI 规则直接实施。
 
 ### B.2 DBT-BI handoff
 
-1. setup 完成后，读取其写入的 `docs/agents/issue-tracker.md`、`docs/agents/domain.md` 以及存在的 triage 配置。
-2. 继续按本 skill 的 Part A 建立/回写四件套；涉及 PBIP 时按 Part C 执行。
-3. 工程实现与验证遵循仓库已配置的 engineering skills 和 issue tracker，不再复制 `references/templates/` 来启动一套 DBT-BI 私有 spec 流程。
-4. 若 setup 的 Explore 或确认阶段发现缺失信息，保留 `NEEDS CLARIFICATION` 并停在对应停点，不要猜测。
+1. 读取 setup 写入的 `docs/agents/` 配置，遵循当前仓库的 issue tracker、domain docs 和其他约定。
+2. 工程规划、记录与验证使用 Coding Agent 动态发现并选中的 Matt Pocock skill；不得复制 `references/templates/` 启动 DBT-BI 私有 spec 流程。
+3. dbt 实现仍须遵循本 skill 的数据语义规则、窄范围验证和仓库安全约束。
+4. 涉及指标、grain 或验数时回写 Part A 四件套；涉及报表时进入 Part C。
 
 ### B.3 用户一句话时
 
 | 用户说 | 行为 |
 | --- | --- |
-| 写 spec / requirements / design / tasks | 先调用 setup skill；按其 Explore → Confirm and edit → Write 流程推进，确认停点暂停 |
-| 改 dbt 逻辑 | 先确保 setup 已完成，再遵循仓库已配置的 engineering skills 实现并验证 |
-| 建立四件套 / 进 PBIP | 直接走 Part A / Part C；若同时涉及工程变更，先走 setup skill |
-| 端到端做完 | setup → Part A → 工程实现与验证 → Part C，按缺口推进 |
+| 写 spec / requirements / design / tasks | 确认 setup 已完成；Coding Agent 动态发现当前环境中匹配的 Matt Pocock skill 后执行 |
+| 改 dbt 逻辑 | 动态发现适用 skill；无专门 skill 时按仓库配置和 DBT-BI 规则直接实现并验证 |
+| 建立四件套 / 进 PBIP | 直接走 Part A / Part C；同时涉及工程变更时再执行本 Part |
+| 端到端做完 | Part 0 → 动态发现与路由 → Part A → 工程实现与验证 → Part C |
 
 ---
 
