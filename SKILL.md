@@ -2,15 +2,16 @@
 name: dbt-bi
 description: >
   DBT-BI end-to-end Analytics Engineer workflow: establish and maintain the four-piece
-  alignment stack (metrics dictionary + schema.yml + analyses + PBI/PBIP DAX), drive
-  spec-based dbt changes (requirements/design/tasks), and implement into Power BI Project
-  (PBIP). Use when the user mentions DBT-BI, dbt-bi, 四件套, 指标字典, schema.yml, analyses,
-  PBIP, .pbip, semantic model, DAX from dictionary, spec/, requirements.md, or runs /dbt-bi.
+  alignment stack (metrics dictionary + schema.yml + analyses + PBI/PBIP DAX), route
+  spec-driven repository changes through the explicit setup-matt-pocock-skills workflow,
+  and implement into Power BI Project (PBIP). Use when the user mentions DBT-BI, dbt-bi,
+  四件套, 指标字典, schema.yml, analyses, PBIP, .pbip, semantic model, DAX from dictionary,
+  spec 驱动, setup-matt-pocock-skills, or runs /dbt-bi.
 ---
 
 # DBT-BI
 
-本 skill 是 **agent 强制规则**（与项目 `AGENTS.md` 同级）：覆盖 **口径四件套 → dbt 变更（spec）→ PBIP 落地**，不是「只写 SQL」或「只贴 prompt」。
+本 skill 是 **agent 强制规则**（与项目 `AGENTS.md` 同级）：覆盖 **口径四件套 → 工程变更入口（调用 setup-matt-pocock-skills）→ PBIP 落地**，不是「只写 SQL」或「只贴 prompt」。
 
 ## When to use
 
@@ -29,7 +30,14 @@ description: >
       + PBI/PBIP（按字典落 DAX）
            │
            ▼
-【单次工程变更】spec 三件套 → 实现 dbt → 回写四件套 → 更新 PBIP → 对数
+【单次工程变更】
+  先显式调用 [$setup-matt-pocock-skills](/Users/larry/.agents/skills/setup-matt-pocock-skills/SKILL.md)
+  Explore → Present findings and ask
+  Confirm and edit → Write
+  配置 issue tracker / triage labels / domain docs
+           │
+           ▼
+【按仓库配置实现 dbt → 回写四件套 → 更新 PBIP → 对数】
 ```
 
 ---
@@ -76,54 +84,38 @@ description: >
 
 ---
 
-## Part B — Spec 驱动 dbt 变更（MUST）
+## Part B — 工程变更入口：调用 setup-matt-pocock-skills（MUST）
 
-改 dbt 业务逻辑时 MUST 走 spec，不得跳过（用户明确 hotfix 豁免除外，仍须最小改动并说明风险）。
+涉及 dbt model、macro、source、test 的工程变更，或用户提出 spec 驱动需求时，MUST 先显式调用 [$setup-matt-pocock-skills](/Users/larry/.agents/skills/setup-matt-pocock-skills/SKILL.md)。
 
-### B.1 强制规则
+该 skill 的 frontmatter 标记为 `disable-model-invocation: true`，因此必须显式调用，不能假定它会被隐式加载。它负责仓库级工程技能配置；DBT-BI 不再维护一套并行的 requirements/design/tasks spec workflow。
 
-1. **MUST** 一次变更一个 `spec/<NNN>_<short_name>/`。
-2. **MUST** 含 `requirements.md`、`design.md`、`tasks.md`（大对账可加 `validation.md`）。
-3. **MUST** 先 commit spec，再改 SQL。
-4. **MUST** 未知写 `NEEDS CLARIFICATION`，禁止猜。
-5. **MUST** 每完成一次相关修改：`git status` → 只提交相关文件 → message 含 spec id。
-6. **MUST** 实现与 spec 冲突：先改 spec 并 commit，再改代码。
-7. **MUST** 窄 selector：`dbt compile/build/test --select <changed+>`。
-8. **MUST** 涉及 grain/指标/验数时 **回写四件套**，禁止只改 SQL。
-9. **NEVER** 扩大未写入 requirements 的 scope；**NEVER** `--no-verify` / 跳 hooks / 主分支 force-push。
+### B.1 setup handoff
 
-### B.2 目录
+按 setup skill 的顺序执行，不得跳过确认停点：
 
-```text
-spec/
-  _template/   # 可从本 skill references/templates 拷贝
-  001_name/
-    requirements.md
-    design.md
-    tasks.md
-```
+1. **Explore**：检查 remote、AGENTS/CLAUDE、现有 `docs/agents/`、上下文文档、ADR、`.scratch/`、triage skill 和 monorepo 信号。
+2. **Present findings and ask**：呈现发现，并按顺序确认 issue tracker、triage labels（仅在安装 triage 时）和 domain docs。
+3. **Confirm and edit**：展示 `## Agent skills` 及 `docs/agents/*.md` 草稿，等待确认或修改。
+4. **Write**：写入选定的 `AGENTS.md`/`CLAUDE.md` 与 `docs/agents/` 配置。
 
-### B.3 阶段（不可跳）
+建议使用 GitHub issue tracker（仓库 remote 指向 GitHub 时）和 single-context；triage labels 只在 triage skill 已安装且用户确认后写入。
 
-| Phase | 动作 | 停点 |
-| --- | --- | --- |
-| 0 定位 | 项目根、`spec/` 下一 id、读相关 model/YAML |  |
-| 1 Requirements | 只写 requirements | 有 NEEDS CLARIFICATION 或待确认 → **停** |
-| 2 Design | 读现状写 design（含测试策略） | 确认前不改业务 SQL |
-| 3 Tasks + commit | 拆 tasks，**只 commit spec** |  |
-| 4 Implement | 按 tasks 实现；小步 commit |  |
-| 5 Verify | compile/build/test/对账，记 Validation Notes |  |
-| 6 四件套/PBIP | 回写字典/schema/analyses；若影响看板则更新 PBIP |  |
+### B.2 DBT-BI handoff
 
-### B.4 用户一句话时
+1. setup 完成后，读取其写入的 `docs/agents/issue-tracker.md`、`docs/agents/domain.md` 以及存在的 triage 配置。
+2. 继续按本 skill 的 Part A 建立/回写四件套；涉及 PBIP 时按 Part C 执行。
+3. 工程实现与验证遵循仓库已配置的 engineering skills 和 issue tracker，不再复制 `references/templates/` 来启动一套 DBT-BI 私有 spec 流程。
+4. 若 setup 的 Explore 或确认阶段发现缺失信息，保留 `NEEDS CLARIFICATION` 并停在对应停点，不要猜测。
 
-| 用户意图 | 行为 |
+### B.3 用户一句话时
+
+| 用户说 | 行为 |
 | --- | --- |
-| 写 spec / requirements | Phase 0–1，停确认 |
-| 出 design | Phase 2，停确认 |
-| 按 tasks 实现 | Phase 4+ |
-| 端到端做完 | 全流程，澄清则暂停 |
-| 建立四件套 / 进 PBIP | Part A / Part C，可与 spec 并行规划 |
+| 写 spec / requirements / design / tasks | 先调用 setup skill；按其 Explore → Confirm and edit → Write 流程推进，确认停点暂停 |
+| 改 dbt 逻辑 | 先确保 setup 已完成，再遵循仓库已配置的 engineering skills 实现并验证 |
+| 建立四件套 / 进 PBIP | 直接走 Part A / Part C；若同时涉及工程变更，先走 setup skill |
+| 端到端做完 | setup → Part A → 工程实现与验证 → Part C，按缺口推进 |
 
 ---
 
@@ -190,4 +182,4 @@ PowerShell 下先 `Set-Location` 到 dbt 项目根，再跑相对路径命令。
 | --- | --- |
 | [references/README.md](references/README.md) | 规范索引 |
 | [references/00-overview.md](references/00-overview.md) … [06-cheatsheet.md](references/06-cheatsheet.md) | 四件套字段/模板级规范（来自团队文档） |
-| [references/templates/](references/templates/) | spec：`requirements` / `design` / `tasks` |
+| [references/templates/](references/templates/) | 历史 spec 链接的兼容性跳转 | 不作为独立 workflow 使用 |
