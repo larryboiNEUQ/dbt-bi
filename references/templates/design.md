@@ -1,90 +1,10 @@
-# SPEC_ID Design - Feature or Bugfix Title
+# Compatibility redirect: design
 
-## Current State
+此文件保留仅为兼容历史链接。
 
-Summarize the current model logic, data flow, and known issue or gap.
+涉及仓库级工程变更或 spec 驱动需求时，先显式调用 [$setup-matt-pocock-skills](/Users/larry/.agents/skills/setup-matt-pocock-skills/SKILL.md)。
+按该 skill 的 Explore → Present findings and ask → Confirm and edit → Write 流程完成仓库配置，再遵循仓库已配置的 engineering skills。
 
-## Proposed dbt Changes
+不要复制本文件启动一套独立的 DBT-BI spec workflow。
 
-| Resource | Change | Reason |
-| --- | --- | --- |
-|  |  |  |
-
-## DAG and Lineage
-
-List affected upstream and downstream nodes.
-
-```text
-source/model -> changed_model -> downstream_model
-```
-
-## Grain, Keys, and Contracts
-
-- Model grain:
-- Primary key:
-- Required fields:
-- Nullability assumptions:
-- Relationship assumptions:
-
-## Transformation Logic
-
-Describe the core SQL logic in plain language before implementation. Include joins, filters, calculations, currency/date logic, and edge cases.
-
-## Materialization and Incremental Strategy
-
-- Materialization:
-- Incremental key, if any:
-- Backfill requirement:
-- Full-refresh risk:
-
-## Testing Strategy
-
-### Data Tests
-
-Add or update YAML tests for model/source integrity.
-
-- [ ] Primary key `unique`
-- [ ] Primary key `not_null`
-- [ ] Important dimensions `accepted_values`
-- [ ] Foreign keys or source relationships `relationships`
-
-### Singular Data Tests
-
-Use `tests/*.sql` when a business assertion should return zero failing rows.
-
-- [ ] 
-
-### Unit Tests
-
-Add dbt unit tests only when the changed SQL has complex or high-risk logic.
-
-- [ ] Complex `case when`
-- [ ] Date math
-- [ ] Regex
-- [ ] Window functions
-- [ ] Prior bug or high-risk refactor
-- [ ] Edge case not present in real data
-
-Unit test YAML must live under `models/` or another configured `model-paths` directory, not under `tests/`.
-
-### Reconciliation Checks
-
-Define comparison checks against previous logic, source-of-truth queries, or sampled records.
-
-- Row count:
-- Key totals:
-- Grouped totals:
-- Sample business keys:
-
-## Validation Commands
-
-```powershell
-dbt compile --select <changed_model+>
-dbt build --select <changed_model+>
-dbt test --select <changed_model+>
-```
-
-## Risks and Rollback
-
-- Risk:
-- Rollback:
+设计完成后，按仓库已配置的 engineering skills 执行实现与验证；不要把本文件视为 DBT-BI 的独立 design 模板。
