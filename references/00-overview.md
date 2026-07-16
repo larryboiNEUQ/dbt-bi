@@ -47,28 +47,19 @@ models/exposures.yml     # 正式 PBI 看板依赖
 
 Agent 发现缺件 → 先补四件套缺口，再大改业务或看板。
 
-#### 2）spec 变更（改 dbt 逻辑时）
+#### 2）工程变更入口（setup skill）
 
-一次变更一个 `spec/<id>_<name>/`：
+改 dbt 逻辑或提出 spec 驱动工程变更时，先显式调用 [$setup-matt-pocock-skills](/Users/larry/.agents/skills/setup-matt-pocock-skills/SKILL.md)。
+DBT-BI 不再维护独立的 requirements/design/tasks spec workflow；该目录中的旧模板只用于兼容历史链接。
 
-| 文件 | 作用 |
-| --- | --- |
-| `requirements.md` | 要什么、为什么 |
-| `design.md` | 怎么改 dbt |
-| `tasks.md` | 有序实现 + 验证 |
+按 setup skill 的四步推进：
 
-可选：大对账加 `validation.md`。
-```plaintext
-建 spec → requirements → design → tasks
-    ↓
-先 commit spec → 按 tasks 实现（小步 commit）
-    ↓
-spec 不对先改 spec → compile/build/test/对账
-    ↓
-回写四件套 → 若影响看板则更新 PBIP
-```
+1. **Explore**：读取仓库 remote、Agent 指令、上下文文档、ADR、既有 `docs/agents/`、`.scratch/` 与 monorepo/triage 信号。
+2. **Present findings and ask**：先报告发现，再按顺序确认 issue tracker、triage labels 和 domain docs。
+3. **Confirm and edit**：确认 `## Agent skills` 和 `docs/agents/*.md` 草稿。
+4. **Write**：写入选定的 Agent 指令文件和 `docs/agents/` 配置。
 
-**规则摘要**：NEEDS CLARIFICATION 禁止猜；先 spec 后 SQL；窄 selector 测试；禁止只在 SQL 注释改口径。
+setup 完成后，回到 DBT-BI 的 Part A / Part C；工程实现与验证遵循该仓库已配置的 engineering skills。
 
 #### 3）落到 PBIP（字典已填时）
 
@@ -77,6 +68,6 @@ spec 不对先改 spec → compile/build/test/对账
 | 用户说 | 走哪段 |
 | --- | --- |
 | 建四件套 / 补字典 schema analyses | Part A |
-| 写 spec / 改 dbt 逻辑 | Part B |
+| 写 spec / 改 dbt 逻辑 | 先调用 setup skill，再遵循仓库配置的工程 workflow |
 | 进 PBIP / 按字典写 DAX | Part C（§4.2） |
 | 端到端做完 | A→B→C 按缺口推进 |
