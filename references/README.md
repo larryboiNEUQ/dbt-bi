@@ -2,6 +2,8 @@
 
 同步自飞书文档《DBT-BI工作流：指标字典 + schema + analyses + PBI》。Agent 建立/维护四件套时 **Read 后严格执行**。
 
+涉及工程变更或 spec 驱动需求时，先显式调用 [$setup-matt-pocock-skills](/Users/larry/.agents/skills/setup-matt-pocock-skills/SKILL.md)；本目录不再提供独立的 spec workflow。
+
 | 文件 | 内容 | 何时读 |
 | --- | --- | --- |
 | [00-overview.md](00-overview.md) | 工作流结构、Skill 功能明细 | 建仓开头 |
@@ -12,6 +14,6 @@
 | [05-release-checklist.md](05-release-checklist.md) | 发版检查 | 发布前 |
 | [06-cheatsheet.md](06-cheatsheet.md) | 总结/口诀 | 随时 |
 | [agents-snippet.md](agents-snippet.md) | 项目 AGENTS.md 片段 | 初始化仓库 |
-| [templates/](templates/) | spec requirements/design/tasks | 开 spec |
+| [templates/](templates/) | 历史 spec 链接的兼容性跳转 | 遇旧链接时查看，不作为独立 workflow |
 
 **与 SKILL.md**：SKILL.md = MUST 规则与流程；本目录 = 字段/模板级规范。
