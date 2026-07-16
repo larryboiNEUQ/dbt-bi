@@ -4,7 +4,7 @@
 
 跨机器使用时，先确认当前 Agent 已安装 `$setup-matt-pocock-skills`；未安装就提示安装并暂停，不使用任何本机绝对路径。新建/初始化 dbt 仓库时，按 [00-overview.md](00-overview.md) 的 setup 流程先完成仓库配置。
 
-涉及工程变更或 spec 驱动需求时，先显式调用 `$setup-matt-pocock-skills`；本目录不再提供独立的 spec workflow。
+涉及工程变更或 spec 驱动需求时，先确认 setup 已完成；完成后由 Coding Agent 在自己的当前环境中动态发现并路由 Matt Pocock engineering skills。本文档不维护固定下游 skill 列表，也不再提供独立的 spec workflow。
 
 | 文件 | 内容 | 何时读 |
 | --- | --- | --- |
