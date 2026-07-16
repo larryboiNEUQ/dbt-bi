@@ -36,6 +36,17 @@ models/exposures.yml     # 正式 PBI 看板依赖
 
 完整规则见 skill **dbt-bi**。文档这里只记功能。
 
+#### 0）DBT 项目初始化：setup skill
+
+新建或首次接管 dbt 仓库时，先检查当前 Agent 是否安装 `$setup-matt-pocock-skills`。未安装时暂停并提示用户按当前 Agent 平台的安装方式安装到本机 skills 目录，安装后重新运行；仓库文档不引用任何具体机器的绝对路径。
+
+已安装后显式调用 `$setup-matt-pocock-skills`，严格走 Explore → Present findings and ask → Confirm and edit → Write：
+
+1. 探索 remote、Agent 指令、上下文文档、ADR、`docs/agents/`、`.scratch/`、triage 和 monorepo 信号。
+2. 呈现发现并确认 issue tracker；triage 未安装则跳过标签确认；domain docs 默认 single-context。
+3. 展示 `## Agent skills` 与 `docs/agents/*.md` 草稿并等待确认；没有 `AGENTS.md`/`CLAUDE.md` 时先询问创建哪一个。
+4. 写入确认后的 Agent 指令和 `docs/agents/` 配置，回读确认后再进入四件套或 dbt 实现。
+
 #### 1）四件套（建仓 / 补齐时）
 
 | 工件 | 作用 |
@@ -49,7 +60,7 @@ Agent 发现缺件 → 先补四件套缺口，再大改业务或看板。
 
 #### 2）工程变更入口（setup skill）
 
-改 dbt 逻辑或提出 spec 驱动工程变更时，先显式调用 [$setup-matt-pocock-skills](/Users/larry/.agents/skills/setup-matt-pocock-skills/SKILL.md)。
+改 dbt 逻辑或提出 spec 驱动工程变更时，先显式调用 `$setup-matt-pocock-skills`。
 DBT-BI 不再维护独立的 requirements/design/tasks spec workflow；该目录中的旧模板只用于兼容历史链接。
 
 按 setup skill 的四步推进：
