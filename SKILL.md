@@ -20,9 +20,16 @@ description: >
 - 把已填字典 + schema 落到 **PBIP**（表、关系、隐藏列、DAX）
 - 用户说「按 DBT-BI / dbt-bi 做」「四件套」「进 PBIP」「按 spec 改」
 
-## 总览：两段式 + 一条变更链
+## 总览：初始化 + 两段式 + 一条变更链
 
 ```text
+【DBT 项目搭建 / 首次使用】
+  检查当前 Agent 是否安装 `$setup-matt-pocock-skills`
+  未安装 → 提示安装并暂停
+  已安装 → 显式调用 `$setup-matt-pocock-skills`
+  Explore → Present findings and ask → Confirm and edit → Write
+           │
+           ▼
 【建立/维护四件套】
   指标字典（口径 + PBI 语义建模列）
       + schema.yml（grain / 字段 / 维键）
@@ -31,14 +38,34 @@ description: >
            │
            ▼
 【单次工程变更】
-  先显式调用 [$setup-matt-pocock-skills](/Users/larry/.agents/skills/setup-matt-pocock-skills/SKILL.md)
-  Explore → Present findings and ask
-  Confirm and edit → Write
-  配置 issue tracker / triage labels / domain docs
-           │
-           ▼
-【按仓库配置实现 dbt → 回写四件套 → 更新 PBIP → 对数】
+  使用已配置的 issue tracker / domain docs / engineering skills
+  dbt 实现 → 回写四件套 → 更新 PBIP → 对数
 ```
+
+---
+
+## Part 0 — DBT 项目初始化：配置 setup skill（MUST）
+
+新建 dbt 项目、初始化已有 dbt 仓库，或首次按 DBT-BI 开始工程工作时，MUST 先完成本节。`$setup-matt-pocock-skills` 的 frontmatter 标记为 `disable-model-invocation: true`，必须显式调用。
+
+### 0.1 检查与安装依赖
+
+- 通过当前 Agent 的技能名解析 `$setup-matt-pocock-skills`；不要在仓库文档中写任何具体用户目录或本机绝对路径。
+- 如果当前 Agent 未安装该 skill，MUST 暂停，不得继续创建 spec、修改 dbt 业务逻辑或写入 setup 配置。
+- 向用户提示：`未检测到 $setup-matt-pocock-skills，请按当前 Agent 平台的安装方式把它安装到当前机器的 skills 目录，安装后重新运行 DBT-BI。`
+- 安装完成后重新检查并显式调用该 skill；不能把另一台机器上的 skill 路径当作替代。
+
+### 0.2 按 setup skill 配置仓库
+
+调用后严格遵循它的停点，不要自行简化成一次性写文件：
+
+1. **Explore**：读取 `git remote -v`、`.git/config`、`AGENTS.md`/`CLAUDE.md`、上下文文档、ADR、`docs/agents/`、`.scratch/`、triage skill 和 monorepo 信号。
+2. **Present findings and ask**：先报告发现，再按顺序确认 issue tracker；仅在 triage skill 已安装时确认 triage labels；domain docs 默认 single-context。
+3. **Confirm and edit**：展示待写入的 `## Agent skills` block 和 `docs/agents/*.md` 草稿，等待用户确认或修改。如果既没有 `CLAUDE.md` 也没有 `AGENTS.md`，先询问创建哪一个。
+4. **Write**：按确认结果更新选定的 Agent 指令文件，并写入 `docs/agents/issue-tracker.md`、`docs/agents/domain.md`，以及仅在需要时写入 `docs/agents/triage-labels.md`。
+5. **Done**：回读配置，说明后续 engineering skills 将从这些文件读取仓库约定。
+
+setup 未完成或停在澄清点时，DBT-BI 也必须停下；不得猜测 issue tracker、triage 标签、上下文布局或直接启动旧模板。
 
 ---
 
@@ -86,7 +113,9 @@ description: >
 
 ## Part B — 工程变更入口：调用 setup-matt-pocock-skills（MUST）
 
-涉及 dbt model、macro、source、test 的工程变更，或用户提出 spec 驱动需求时，MUST 先显式调用 [$setup-matt-pocock-skills](/Users/larry/.agents/skills/setup-matt-pocock-skills/SKILL.md)。
+涉及 dbt model、macro、source、test 的工程变更，或用户提出 spec 驱动需求时，MUST 先显式调用 `$setup-matt-pocock-skills`。
+
+如果尚未完成 Part 0，必须先回到 Part 0；不能直接创建 spec 文件或开始工程实现。
 
 该 skill 的 frontmatter 标记为 `disable-model-invocation: true`，因此必须显式调用，不能假定它会被隐式加载。它负责仓库级工程技能配置；DBT-BI 不再维护一套并行的 requirements/design/tasks spec workflow。
 
