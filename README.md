@@ -17,7 +17,7 @@ Analytics Engineer end-to-end skill: **四件套**（指标字典 + schema.yml +
 
 ## 结构
 
-- `SKILL.md` — MUST 规则与流程（Part A 四件套 / B 工程变更入口 / C PBIP）
+- `SKILL.md` — MUST 规则与流程（Part 0 setup / Part A 四件套 / B 工程变更入口 / C PBIP）
 - `references/` — **文档级规范**（字段表、兼容入口、检查清单）
   - 见 [references/README.md](references/README.md)
 - `references/templates/` — 兼容性跳转（规范入口见 setup skill）
